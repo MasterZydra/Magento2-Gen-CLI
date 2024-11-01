@@ -1,0 +1,26 @@
+{
+    "name": "masterzydra/magento2-gen-cli",
+    "description": "Module that adds CLI commands to create modules, controllers, etc.",
+    "keywords": ["Mage2Gen", "Magento", "Magento2"],
+    "type": "magento2-module",
+    "require": {
+        "php": "^8.1",
+        "magento/framework": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MasterZydra\\GenCli\\": ""
+        }
+    },
+    "authors": [
+        {
+            "name": "David Hein",
+            "email": "github@davidhein.de"
+        }
+    ],
+    "minimum-stability": "stable"
+}
