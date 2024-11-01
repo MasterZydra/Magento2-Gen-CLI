@@ -1,0 +1,4 @@
+<?php
+/** @var \{{ vendor }}\{{ module }}\Block\{{ section }}\{{ action }} $block */
+?>
+Hello {{ section_lower }}/{{ action_lower }}.phtml

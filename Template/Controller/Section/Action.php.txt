@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace {{ vendor }}\{{ module }}\Controller\{{ section}};
+namespace {{ vendor }}\{{ module }}\Controller\{{ section }};
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultInterface;

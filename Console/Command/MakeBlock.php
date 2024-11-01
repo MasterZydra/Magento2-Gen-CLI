@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeController extends Command
+class MakeBlock extends Command
 {
     private const VENDOR = 'vendor';
     private const MODULE = 'module';
@@ -31,8 +31,8 @@ class MakeController extends Command
     /** @inheritdoc */
     protected function configure(): void
     {
-        $this->setName('make:controller');
-        $this->setDescription('Create a new controller');
+        $this->setName('make:block');
+        $this->setDescription('Create a new block');
         $this->addArgument(self::VENDOR, InputArgument::OPTIONAL, 'Vendor name (e.g. \'Magento\')');
         $this->addArgument(self::MODULE, InputArgument::OPTIONAL, 'Module name (e.g. \'Sales\')');
         $this->addArgument(self::SECTION, InputArgument::OPTIONAL, 'Section name (e.g. \'Index\')');
@@ -63,6 +63,7 @@ class MakeController extends Command
         }
 
         $modulePath = $this->helper->joinPaths($this->helper->appCodePath(), $vendor, $module);
+        $moduleName = $vendor. '_' . $module;
 
         // Check if module exists
         if (!$this->helper->exists($modulePath)) {
@@ -91,20 +92,31 @@ class MakeController extends Command
 
         $output->writeln('');
 
-        $controllerPath = $this->helper->joinPaths($modulePath, 'Controller', $section, $action . '.php');
+        $blockPath = $this->helper->joinPaths($modulePath, 'Block', $section, $action . '.php');
+        $layoutName = strtolower($vendor) . '_' . strtolower($module) . '_' . strtolower($section) . '_' . strtolower($action) . '.xml';
+        $layoutPath = $this->helper->joinPaths($modulePath, 'view', 'frontend', 'templates', 'layout', $layoutName);
+        $templatePath = $this->helper->joinPaths($modulePath, 'view', 'frontend', 'templates', $section, $action . '.phtml');
 
-        // Check if controller already exists
-        if ($this->helper->exists($controllerPath)) {
-            $output->writeln("Controller '$section/$action' already exists!");
+        // Check if block already exists
+        if ($this->helper->exists($blockPath)) {
+            $output->writeln("Block '$section/$action' already exists!");
+            return 1;
+        }
+        if ($this->helper->exists($layoutPath)) {
+            $output->writeln("Layout '$layoutName' already exists!");
+            return 1;
+        }
+        if ($this->helper->exists($templatePath)) {
+            $output->writeln("Template '$section/$action.phtml' already exists!");
             return 1;
         }
 
-        $output->writeln('Generating controller...');
+        $output->writeln('Generating block...');
 
-        // Generate file
+        // Generate files
         if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'Controller', 'Section', 'Action.php.txt'),
-            $controllerPath,
+            $this->helper->joinPaths($this->helper->templatePath(), 'Block', 'Section', 'Action.php.txt'),
+            $blockPath,
             [
                 '{{ vendor }}' => $vendor,
                 '{{ module }}' => $module,
@@ -112,12 +124,45 @@ class MakeController extends Command
                 '{{ action }}' => $action,
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('Controller', $section, $action . '.php') . '\'');
+            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('Block', $section, $action . '.php') . '\'');
+            return 1;
+        }
+
+        if (!$this->helper->copyTemplate(
+            $this->helper->joinPaths($this->helper->templatePath(), 'view', 'frontend', 'templates', 'layout', 'vendor_module_section_action.xml'),
+            $layoutPath,
+            [
+                '{{ module_name }}' => $moduleName,
+                '{{ vendor }}' => $vendor,
+                '{{ module }}' => $module,
+                '{{ section }}' => $section,
+                '{{ section_lower }}' => strtolower($section),
+                '{{ action }}' => $action,
+                '{{ action_lower }}' => strtolower($action),
+            ],
+        )) {
+            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('view', 'frontend', 'templates', 'layout', $layoutName) . '\'');
+            return 1;
+        }
+
+        if (!$this->helper->copyTemplate(
+            $this->helper->joinPaths($this->helper->templatePath(), 'view', 'frontend', 'templates', 'section', 'action.phtml.txt'),
+            $templatePath,
+            [
+                '{{ vendor }}' => $vendor,
+                '{{ module }}' => $module,
+                '{{ section }}' => $section,
+                '{{ section_lower }}' => strtolower($section),
+                '{{ action }}' => $action,
+                '{{ action_lower }}' => strtolower($action),
+            ],
+        )) {
+            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('view', 'frontend', 'templates', $section, $action . '.phtml') . '\'');
             return 1;
         }
 
         $output->writeln('');
-        $output->writeln("Controller '$section/$action' was created.");
+        $output->writeln("Block '$section/$action' was created.");
         return 0;
     }
 }

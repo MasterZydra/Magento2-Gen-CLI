@@ -1,0 +1,19 @@
+
+<?php
+
+declare(strict_types=1);
+
+namespace {{ vendor }}\{{ module }}\Block\{{ section }};
+
+use Magento\Framework\View\Element\Template;
+
+class {{ action }} extends Template
+{
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+    }
+}
+

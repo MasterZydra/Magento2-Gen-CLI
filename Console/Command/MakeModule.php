@@ -81,7 +81,7 @@ class MakeModule extends Command
         if (!$this->helper->copyTemplate(
             $this->helper->joinPaths($this->helper->templatePath(), 'registration.php.txt'),
             $this->helper->joinPaths($modulePath, 'registration.php'),
-            ['{{ modulename }}' => $moduleName],
+            ['{{ module_name }}' => $moduleName],
         )) {
             $output->writeln('An error occured while creating \'registration.php\'');
             return 1;
@@ -90,7 +90,7 @@ class MakeModule extends Command
         if (!$this->helper->copyTemplate(
             $this->helper->joinPaths($this->helper->templatePath(), 'etc', 'module.xml'),
             $this->helper->joinPaths($modulePath, 'etc', 'module.xml'),
-            ['{{ modulename }}' => $moduleName],
+            ['{{ module_name }}' => $moduleName],
         )) {
             $output->writeln('An error occured while creating \'ect/module.xml\'');
             return 1;
