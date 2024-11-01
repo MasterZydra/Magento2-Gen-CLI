@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ vendor }}\{{ module }}\Controller\{{ section}};
+
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\PageFactory;
+
+class {{ action }} implements HttpGetActionInterface
+{
+    public function __construct(
+        protected PageFactory $resultPageFactory
+    ) {
+    }
+
+    /** Execute view action */
+    public function execute(): ResultInterface
+    {
+        return $this->resultPageFactory->create();
+    }
+}

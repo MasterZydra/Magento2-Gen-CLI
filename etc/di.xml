@@ -3,6 +3,7 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
+                <item name="MakeController" xsi:type="object">MasterZydra\GenCli\Console\Command\MakeController</item>
                 <item name="MakeModule" xsi:type="object">MasterZydra\GenCli\Console\Command\MakeModule</item>
             </argument>
         </arguments>
