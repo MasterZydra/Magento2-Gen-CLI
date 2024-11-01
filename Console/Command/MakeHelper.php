@@ -13,12 +13,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeController extends Command
+class MakeHelper extends Command
 {
     private const VENDOR = 'vendor';
     private const MODULE = 'module';
-    private const SECTION = 'section';
-    private const ACTION = 'action';
+    private const NAME = 'name';
 
     /** @inheritdoc */
     public function __construct(
@@ -31,12 +30,11 @@ class MakeController extends Command
     /** @inheritdoc */
     protected function configure(): void
     {
-        $this->setName('make:controller');
-        $this->setDescription('Create a new controller');
+        $this->setName('make:helper');
+        $this->setDescription('Create a new helper');
         $this->addArgument(self::VENDOR, InputArgument::OPTIONAL, 'Vendor name (e.g. \'Magento\')');
         $this->addArgument(self::MODULE, InputArgument::OPTIONAL, 'Module name (e.g. \'Sales\')');
-        $this->addArgument(self::SECTION, InputArgument::OPTIONAL, 'Section name (e.g. \'Index\')');
-        $this->addArgument(self::ACTION, InputArgument::OPTIONAL, 'Action name (e.g. \'Index\')');
+        $this->addArgument(self::NAME, InputArgument::OPTIONAL, 'Helper name (e.g. \'Sync\')');
         parent::configure();
     }
 
@@ -71,53 +69,43 @@ class MakeController extends Command
         }
 
         // User inputs
-        $section = $input->getArgument(self::SECTION);
-        if (empty($section)) {
-            $section = $this->helper->askQuestion($input, $output, 'Section name (e.g. \'Index\'): ', null);
-            if (empty($section)) {
-                $output->writeln('Section name is required!');
-                return 1;
-            }
-        }
-
-        $action = $input->getArgument(self::ACTION);
-        if (empty($action)) {
-            $action = $this->helper->askQuestion($input, $output, 'Action name (e.g. \'Index\'): ', null);
-            if (empty($action)) {
-                $output->writeln('Action name is required!');
+        $name = $input->getArgument(self::NAME);
+        if (empty($name)) {
+            $name = $this->helper->askQuestion($input, $output, 'Helper name (e.g. \'Sync\'): ', null);
+            if (empty($name)) {
+                $output->writeln('Helper name is required!');
                 return 1;
             }
         }
 
         $output->writeln('');
 
-        $controllerPath = $this->helper->joinPaths($modulePath, 'Controller', $section, $action . '.php');
+        $helperPath = $this->helper->joinPaths($modulePath, 'Helper', $name . '.php');
 
-        // Check if controller already exists
-        if ($this->helper->exists($controllerPath)) {
-            $output->writeln("Controller '$section/$action' already exists!");
+        // Check if helper already exists
+        if ($this->helper->exists($helperPath)) {
+            $output->writeln("Helper '$name' already exists!");
             return 1;
         }
 
-        $output->writeln('Generating controller...');
+        $output->writeln('Generating helper...');
 
         // Generate file
         if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'Controller', 'Section', 'Action.php.txt'),
-            $controllerPath,
+            $this->helper->joinPaths($this->helper->templatePath(), 'Helper', 'Data.php.txt'),
+            $helperPath,
             [
                 '{{ vendor }}' => $vendor,
                 '{{ module }}' => $module,
-                '{{ section}}' => $section,
-                '{{ action }}' => $action,
+                '{{ name }}' => $name,
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('Controller', $section, $action . '.php') . '\'');
+            $output->writeln('An error occured while creating \''. $this->helper->joinPaths('Helper', $name . '.php') . '\'');
             return 1;
         }
 
         $output->writeln('');
-        $output->writeln("Controller '$section/$action' was created.");
+        $output->writeln("Helper '$name' was created.");
         return 0;
     }
 }
