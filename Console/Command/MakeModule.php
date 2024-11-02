@@ -9,6 +9,7 @@ namespace MasterZydra\GenCli\Console\Command;
 use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use MasterZydra\GenCli\Helper\Question;
+use MasterZydra\GenCli\Model\Module;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,6 +25,7 @@ class MakeModule extends Command
         private Dir $dir,
         private File $file,
         private Question $question,
+        private Module $module,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -63,40 +65,17 @@ class MakeModule extends Command
 
         $output->writeln('');
 
-        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
-        $moduleName = $vendor. '_' . $module;
+        $this->module->init($vendor, $module, $output);
 
-        // Create module folder
-        if ($this->file->exists($modulePath)) {
-            $output->writeln("Module '$vendor/$module' already exists!");
-            return 1;
-        }
-
-        if (!$this->file->mkDir($modulePath)) {
-            $output->writeln('An error occured while creating the module directory!');
+        // Check if module already exists
+        if ($this->module->exists()) {
             return 1;
         }
 
         $output->writeln('Generating module...');
 
         // Generate files
-        // Source: https://experienceleague.adobe.com/en/docs/commerce-learn/tutorials/backend-development/create-module
-
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'registration.php.txt'),
-            $this->file->join($modulePath, 'registration.php'),
-            ['{{ module_name }}' => $moduleName],
-        )) {
-            $output->writeln('An error occured while creating \'registration.php\'');
-            return 1;
-        }
-
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'etc', 'module.xml'),
-            $this->file->join($modulePath, 'etc', 'module.xml'),
-            ['{{ module_name }}' => $moduleName],
-        )) {
-            $output->writeln('An error occured while creating \'ect/module.xml\'');
+        if (!$this->module->copy()) {
             return 1;
         }
 

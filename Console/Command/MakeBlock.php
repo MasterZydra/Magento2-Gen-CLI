@@ -10,6 +10,8 @@ namespace MasterZydra\GenCli\Console\Command;
 use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use MasterZydra\GenCli\Helper\Question;
+use MasterZydra\GenCli\Model\Block;
+use MasterZydra\GenCli\Model\Module;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +29,8 @@ class MakeBlock extends Command
         private Dir $dir,
         private File $file,
         private Question $question,
+        private Module $module,
+        private Block $block,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -66,11 +70,10 @@ class MakeBlock extends Command
             }
         }
 
-        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
-        $moduleName = $vendor. '_' . $module;
+        $this->module->init($vendor, $module, $output);
 
         // Check if module exists
-        if (!$this->file->exists($modulePath)) {
+        if (!$this->module->exists(false)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
             return 1;
         }
@@ -96,72 +99,17 @@ class MakeBlock extends Command
 
         $output->writeln('');
 
-        $blockPath = $this->file->join($modulePath, 'Block', $section, $action . '.php');
-        $layoutName = strtolower($vendor) . '_' . strtolower($module) . '_' . strtolower($section) . '_' . strtolower($action) . '.xml';
-        $layoutPath = $this->file->join($modulePath, 'view', 'frontend', 'templates', 'layout', $layoutName);
-        $templatePath = $this->file->join($modulePath, 'view', 'frontend', 'templates', $section, $action . '.phtml');
+        $this->block->init($this->module, $section, $action);
 
         // Check if block already exists
-        if ($this->file->exists($blockPath)) {
-            $output->writeln("Block '$section/$action' already exists!");
-            return 1;
-        }
-        if ($this->file->exists($layoutPath)) {
-            $output->writeln("Layout '$layoutName' already exists!");
-            return 1;
-        }
-        if ($this->file->exists($templatePath)) {
-            $output->writeln("Template '$section/$action.phtml' already exists!");
+        if ($this->block->exists()) {
             return 1;
         }
 
         $output->writeln('Generating block...');
 
         // Generate files
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Block', 'Section', 'Action.php.txt'),
-            $blockPath,
-            [
-                '{{ vendor }}' => $vendor,
-                '{{ module }}' => $module,
-                '{{ section }}' => $section,
-                '{{ action }}' => $action,
-            ],
-        )) {
-            $output->writeln('An error occured while creating \'' . $this->file->join('Block', $section, $action . '.php') . '\'');
-            return 1;
-        }
-
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'layout', 'vendor_module_section_action.xml'),
-            $layoutPath,
-            [
-                '{{ module_name }}' => $moduleName,
-                '{{ vendor }}' => $vendor,
-                '{{ module }}' => $module,
-                '{{ section }}' => $section,
-                '{{ section_lower }}' => strtolower($section),
-                '{{ action }}' => $action,
-                '{{ action_lower }}' => strtolower($action),
-            ],
-        )) {
-            $output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', 'layout', $layoutName) . '\'');
-            return 1;
-        }
-
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'section', 'action.phtml.txt'),
-            $templatePath,
-            [
-                '{{ vendor }}' => $vendor,
-                '{{ module }}' => $module,
-                '{{ section }}' => $section,
-                '{{ section_lower }}' => strtolower($section),
-                '{{ action }}' => $action,
-                '{{ action_lower }}' => strtolower($action),
-            ],
-        )) {
-            $output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', $section, $action . '.phtml') . '\'');
+        if (!$this->block->copy()) {
             return 1;
         }
 

@@ -10,6 +10,8 @@ namespace MasterZydra\GenCli\Console\Command;
 use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use MasterZydra\GenCli\Helper\Question;
+use MasterZydra\GenCli\Model\Helper;
+use MasterZydra\GenCli\Model\Module;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +28,8 @@ class MakeHelper extends Command
         private Dir $dir,
         private File $file,
         private Question $question,
+        private Module $module,
+        private Helper $helper,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -64,10 +68,10 @@ class MakeHelper extends Command
             }
         }
 
-        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
+        $this->module->init($vendor, $module, $output);
 
         // Check if module exists
-        if (!$this->file->exists($modulePath)) {
+        if (!$this->module->exists(false)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
             return 1;
         }
@@ -84,27 +88,17 @@ class MakeHelper extends Command
 
         $output->writeln('');
 
-        $helperPath = $this->file->join($modulePath, 'Helper', $name . '.php');
+        $this->helper->init($this->module, $name);
 
         // Check if helper already exists
-        if ($this->file->exists($helperPath)) {
-            $output->writeln("Helper '$name' already exists!");
+        if ($this->helper->exists()) {
             return 1;
         }
 
         $output->writeln('Generating helper...');
 
         // Generate file
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Helper', 'Data.php.txt'),
-            $helperPath,
-            [
-                '{{ vendor }}' => $vendor,
-                '{{ module }}' => $module,
-                '{{ name }}' => $name,
-            ],
-        )) {
-            $output->writeln('An error occured while creating \''. $this->file->join('Helper', $name . '.php') . '\'');
+        if (!$this->helper->copy()) {
             return 1;
         }
 

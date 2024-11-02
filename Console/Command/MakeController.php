@@ -10,6 +10,8 @@ namespace MasterZydra\GenCli\Console\Command;
 use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use MasterZydra\GenCli\Helper\Question;
+use MasterZydra\GenCli\Model\Controller;
+use MasterZydra\GenCli\Model\Module;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +29,8 @@ class MakeController extends Command
         private Dir $dir,
         private File $file,
         private Question $question,
+        private Module $module,
+        private Controller $controller,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -66,10 +70,10 @@ class MakeController extends Command
             }
         }
 
-        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
+        $this->module->init($vendor, $module, $output);
 
         // Check if module exists
-        if (!$this->file->exists($modulePath)) {
+        if (!$this->module->exists(false)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
             return 1;
         }
@@ -95,28 +99,17 @@ class MakeController extends Command
 
         $output->writeln('');
 
-        $controllerPath = $this->file->join($modulePath, 'Controller', $section, $action . '.php');
+        $this->controller->init($this->module, $section, $action);
 
         // Check if controller already exists
-        if ($this->file->exists($controllerPath)) {
-            $output->writeln("Controller '$section/$action' already exists!");
+        if ($this->controller->exists()) {
             return 1;
         }
 
         $output->writeln('Generating controller...');
 
         // Generate file
-        if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Controller', 'Section', 'Action.php.txt'),
-            $controllerPath,
-            [
-                '{{ vendor }}' => $vendor,
-                '{{ module }}' => $module,
-                '{{ section }}' => $section,
-                '{{ action }}' => $action,
-            ],
-        )) {
-            $output->writeln('An error occured while creating \'' . $this->file->join('Controller', $section, $action . '.php') . '\'');
+        if (!$this->controller->copy()) {
             return 1;
         }
 
