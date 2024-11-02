@@ -31,14 +31,14 @@ Module 'Magento/Sales' was created.
 
 ## Installation
 This Magento2 module can be installed using composer:  
-`> composer require masterzydra/masterzydra/magento2-gen-cli`
+`> composer require masterzydra/magento2-gen-cli`
 
 To remove it from the list of required packages use the following command:  
-`> composer remove masterzydra/masterzydra/magento2-gen-cli`
+`> composer remove masterzydra/magento2-gen-cli`
 
 ## Updating to latest version
 With the following command composer checks all packages in the composer.json for the latest version:  
 `> composer update`
 
 If you only want to check this package for newer versions, you can use  
-`> composer update masterzydra/masterzydra/magento2-gen-cli`
+`> composer update masterzydra/magento2-gen-cli`
