@@ -10,6 +10,7 @@ namespace MasterZydra\GenCli\Console\Command;
 use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use MasterZydra\GenCli\Helper\Question;
+use MasterZydra\GenCli\Model\Block;
 use MasterZydra\GenCli\Model\Controller;
 use MasterZydra\GenCli\Model\Module;
 use Symfony\Component\Console\Command\Command;
@@ -23,6 +24,7 @@ class MakeController extends Command
     private const MODULE = 'module';
     private const SECTION = 'section';
     private const ACTION = 'action';
+    private const BLOCK = 'block';
 
     /** @inheritdoc */
     public function __construct(
@@ -31,6 +33,7 @@ class MakeController extends Command
         private Question $question,
         private Module $module,
         private Controller $controller,
+        private Block $block,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -45,6 +48,7 @@ class MakeController extends Command
         $this->addArgument(self::MODULE, InputArgument::OPTIONAL, 'Module name (e.g. \'Sales\')');
         $this->addArgument(self::SECTION, InputArgument::OPTIONAL, 'Section name (e.g. \'Index\')');
         $this->addArgument(self::ACTION, InputArgument::OPTIONAL, 'Action name (e.g. \'Index\')');
+        $this->addArgument(self::BLOCK, InputArgument::OPTIONAL, 'Create block (\'y\' or \'n\')?');
         parent::configure();
     }
 
@@ -106,6 +110,12 @@ class MakeController extends Command
             return 1;
         }
 
+        $block = $input->getArgument(self::BLOCK);
+        if (empty($block)) {
+            $block = $this->question->ask($input, $output, 'Create block (\'y\' or \'n\')? ', null);
+            $output->writeln('');
+        }
+
         $output->writeln('Generating controller...');
 
         // Generate file
@@ -115,6 +125,28 @@ class MakeController extends Command
 
         $output->writeln('');
         $output->writeln("Controller '$section/$action' was created.");
+
+        if (strtolower($block) === 'y') {
+            $output->writeln('');
+
+            $this->block->init($this->module, $section, $action);
+
+            // Check if block already exists
+            if ($this->block->exists()) {
+                return 1;
+            }
+
+            $output->writeln('Generating block...');
+
+            // Generate files
+            if (!$this->block->copy()) {
+                return 1;
+            }
+
+            $output->writeln('');
+            $output->writeln("Block '$section/$action' was created.");
+        }
+
         return 0;
     }
 }
