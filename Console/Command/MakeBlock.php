@@ -7,7 +7,9 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Console\Command;
 
-use MasterZydra\GenCli\Helper\Data;
+use MasterZydra\GenCli\Helper\Dir;
+use MasterZydra\GenCli\Helper\File;
+use MasterZydra\GenCli\Helper\Question;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +24,9 @@ class MakeBlock extends Command
 
     /** @inheritdoc */
     public function __construct(
-        private Data $helper,
+        private Dir $dir,
+        private File $file,
+        private Question $question,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -46,7 +50,7 @@ class MakeBlock extends Command
         // User inputs
         $vendor = $input->getArgument(self::VENDOR);
         if (empty($vendor)) {
-            $vendor = $this->helper->askQuestion($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
+            $vendor = $this->question->ask($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
             if (empty($vendor)) {
                 $output->writeln('Vendor name is required!');
                 return 1;
@@ -55,18 +59,18 @@ class MakeBlock extends Command
 
         $module = $input->getArgument(self::MODULE);
         if (empty($module)) {
-            $module = $this->helper->askQuestion($input, $output, 'Module name (e.g. \'Sales\'): ', null);
+            $module = $this->question->ask($input, $output, 'Module name (e.g. \'Sales\'): ', null);
             if (empty($module)) {
                 $output->writeln('Module name is required!');
                 return 1;
             }
         }
 
-        $modulePath = $this->helper->joinPaths($this->helper->appCodePath(), $vendor, $module);
+        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
         $moduleName = $vendor. '_' . $module;
 
         // Check if module exists
-        if (!$this->helper->exists($modulePath)) {
+        if (!$this->file->exists($modulePath)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
             return 1;
         }
@@ -74,7 +78,7 @@ class MakeBlock extends Command
         // User inputs
         $section = $input->getArgument(self::SECTION);
         if (empty($section)) {
-            $section = $this->helper->askQuestion($input, $output, 'Section name (e.g. \'Index\'): ', null);
+            $section = $this->question->ask($input, $output, 'Section name (e.g. \'Index\'): ', null);
             if (empty($section)) {
                 $output->writeln('Section name is required!');
                 return 1;
@@ -83,7 +87,7 @@ class MakeBlock extends Command
 
         $action = $input->getArgument(self::ACTION);
         if (empty($action)) {
-            $action = $this->helper->askQuestion($input, $output, 'Action name (e.g. \'Index\'): ', null);
+            $action = $this->question->ask($input, $output, 'Action name (e.g. \'Index\'): ', null);
             if (empty($action)) {
                 $output->writeln('Action name is required!');
                 return 1;
@@ -92,21 +96,21 @@ class MakeBlock extends Command
 
         $output->writeln('');
 
-        $blockPath = $this->helper->joinPaths($modulePath, 'Block', $section, $action . '.php');
+        $blockPath = $this->file->join($modulePath, 'Block', $section, $action . '.php');
         $layoutName = strtolower($vendor) . '_' . strtolower($module) . '_' . strtolower($section) . '_' . strtolower($action) . '.xml';
-        $layoutPath = $this->helper->joinPaths($modulePath, 'view', 'frontend', 'templates', 'layout', $layoutName);
-        $templatePath = $this->helper->joinPaths($modulePath, 'view', 'frontend', 'templates', $section, $action . '.phtml');
+        $layoutPath = $this->file->join($modulePath, 'view', 'frontend', 'templates', 'layout', $layoutName);
+        $templatePath = $this->file->join($modulePath, 'view', 'frontend', 'templates', $section, $action . '.phtml');
 
         // Check if block already exists
-        if ($this->helper->exists($blockPath)) {
+        if ($this->file->exists($blockPath)) {
             $output->writeln("Block '$section/$action' already exists!");
             return 1;
         }
-        if ($this->helper->exists($layoutPath)) {
+        if ($this->file->exists($layoutPath)) {
             $output->writeln("Layout '$layoutName' already exists!");
             return 1;
         }
-        if ($this->helper->exists($templatePath)) {
+        if ($this->file->exists($templatePath)) {
             $output->writeln("Template '$section/$action.phtml' already exists!");
             return 1;
         }
@@ -114,8 +118,8 @@ class MakeBlock extends Command
         $output->writeln('Generating block...');
 
         // Generate files
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'Block', 'Section', 'Action.php.txt'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'Block', 'Section', 'Action.php.txt'),
             $blockPath,
             [
                 '{{ vendor }}' => $vendor,
@@ -124,12 +128,12 @@ class MakeBlock extends Command
                 '{{ action }}' => $action,
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('Block', $section, $action . '.php') . '\'');
+            $output->writeln('An error occured while creating \'' . $this->file->join('Block', $section, $action . '.php') . '\'');
             return 1;
         }
 
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'view', 'frontend', 'templates', 'layout', 'vendor_module_section_action.xml'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'layout', 'vendor_module_section_action.xml'),
             $layoutPath,
             [
                 '{{ module_name }}' => $moduleName,
@@ -141,12 +145,12 @@ class MakeBlock extends Command
                 '{{ action_lower }}' => strtolower($action),
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('view', 'frontend', 'templates', 'layout', $layoutName) . '\'');
+            $output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', 'layout', $layoutName) . '\'');
             return 1;
         }
 
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'view', 'frontend', 'templates', 'section', 'action.phtml.txt'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'section', 'action.phtml.txt'),
             $templatePath,
             [
                 '{{ vendor }}' => $vendor,
@@ -157,7 +161,7 @@ class MakeBlock extends Command
                 '{{ action_lower }}' => strtolower($action),
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('view', 'frontend', 'templates', $section, $action . '.phtml') . '\'');
+            $output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', $section, $action . '.phtml') . '\'');
             return 1;
         }
 

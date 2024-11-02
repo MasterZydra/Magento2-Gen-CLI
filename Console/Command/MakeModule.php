@@ -6,7 +6,9 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Console\Command;
 
-use MasterZydra\GenCli\Helper\Data;
+use MasterZydra\GenCli\Helper\Dir;
+use MasterZydra\GenCli\Helper\File;
+use MasterZydra\GenCli\Helper\Question;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +21,9 @@ class MakeModule extends Command
 
     /** @inheritdoc */
     public function __construct(
-        private Data $helper,
+        private Dir $dir,
+        private File $file,
+        private Question $question,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -41,7 +45,7 @@ class MakeModule extends Command
         // User inputs
         $vendor = $input->getArgument(self::VENDOR);
         if (empty($vendor)) {
-            $vendor = $this->helper->askQuestion($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
+            $vendor = $this->question->ask($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
             if (empty($vendor)) {
                 $output->writeln('Vendor name is required!');
                 return 1;
@@ -50,7 +54,7 @@ class MakeModule extends Command
 
         $module = $input->getArgument(self::MODULE);
         if (empty($module)) {
-            $module = $this->helper->askQuestion($input, $output, 'Module name (e.g. \'Sales\'): ', null);
+            $module = $this->question->ask($input, $output, 'Module name (e.g. \'Sales\'): ', null);
             if (empty($module)) {
                 $output->writeln('Module name is required!');
                 return 1;
@@ -59,16 +63,16 @@ class MakeModule extends Command
 
         $output->writeln('');
 
-        $modulePath = $this->helper->joinPaths($this->helper->appCodePath(), $vendor, $module);
+        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
         $moduleName = $vendor. '_' . $module;
 
         // Create module folder
-        if ($this->helper->exists($modulePath)) {
+        if ($this->file->exists($modulePath)) {
             $output->writeln("Module '$vendor/$module' already exists!");
             return 1;
         }
 
-        if (!$this->helper->mkDir($modulePath)) {
+        if (!$this->file->mkDir($modulePath)) {
             $output->writeln('An error occured while creating the module directory!');
             return 1;
         }
@@ -78,18 +82,18 @@ class MakeModule extends Command
         // Generate files
         // Source: https://experienceleague.adobe.com/en/docs/commerce-learn/tutorials/backend-development/create-module
 
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'registration.php.txt'),
-            $this->helper->joinPaths($modulePath, 'registration.php'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'registration.php.txt'),
+            $this->file->join($modulePath, 'registration.php'),
             ['{{ module_name }}' => $moduleName],
         )) {
             $output->writeln('An error occured while creating \'registration.php\'');
             return 1;
         }
 
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'etc', 'module.xml'),
-            $this->helper->joinPaths($modulePath, 'etc', 'module.xml'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'etc', 'module.xml'),
+            $this->file->join($modulePath, 'etc', 'module.xml'),
             ['{{ module_name }}' => $moduleName],
         )) {
             $output->writeln('An error occured while creating \'ect/module.xml\'');

@@ -7,7 +7,9 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Console\Command;
 
-use MasterZydra\GenCli\Helper\Data;
+use MasterZydra\GenCli\Helper\Dir;
+use MasterZydra\GenCli\Helper\File;
+use MasterZydra\GenCli\Helper\Question;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,7 +24,9 @@ class MakeController extends Command
 
     /** @inheritdoc */
     public function __construct(
-        private Data $helper,
+        private Dir $dir,
+        private File $file,
+        private Question $question,
         ?string $name = null
     ) {
         parent::__construct($name);
@@ -46,7 +50,7 @@ class MakeController extends Command
         // User inputs
         $vendor = $input->getArgument(self::VENDOR);
         if (empty($vendor)) {
-            $vendor = $this->helper->askQuestion($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
+            $vendor = $this->question->ask($input, $output, 'Vendor name (e.g. \'Magento\'): ', false);
             if (empty($vendor)) {
                 $output->writeln('Vendor name is required!');
                 return 1;
@@ -55,17 +59,17 @@ class MakeController extends Command
 
         $module = $input->getArgument(self::MODULE);
         if (empty($module)) {
-            $module = $this->helper->askQuestion($input, $output, 'Module name (e.g. \'Sales\'): ', null);
+            $module = $this->question->ask($input, $output, 'Module name (e.g. \'Sales\'): ', null);
             if (empty($module)) {
                 $output->writeln('Module name is required!');
                 return 1;
             }
         }
 
-        $modulePath = $this->helper->joinPaths($this->helper->appCodePath(), $vendor, $module);
+        $modulePath = $this->file->join($this->dir->appCode(), $vendor, $module);
 
         // Check if module exists
-        if (!$this->helper->exists($modulePath)) {
+        if (!$this->file->exists($modulePath)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
             return 1;
         }
@@ -73,7 +77,7 @@ class MakeController extends Command
         // User inputs
         $section = $input->getArgument(self::SECTION);
         if (empty($section)) {
-            $section = $this->helper->askQuestion($input, $output, 'Section name (e.g. \'Index\'): ', null);
+            $section = $this->question->ask($input, $output, 'Section name (e.g. \'Index\'): ', null);
             if (empty($section)) {
                 $output->writeln('Section name is required!');
                 return 1;
@@ -82,7 +86,7 @@ class MakeController extends Command
 
         $action = $input->getArgument(self::ACTION);
         if (empty($action)) {
-            $action = $this->helper->askQuestion($input, $output, 'Action name (e.g. \'Index\'): ', null);
+            $action = $this->question->ask($input, $output, 'Action name (e.g. \'Index\'): ', null);
             if (empty($action)) {
                 $output->writeln('Action name is required!');
                 return 1;
@@ -91,10 +95,10 @@ class MakeController extends Command
 
         $output->writeln('');
 
-        $controllerPath = $this->helper->joinPaths($modulePath, 'Controller', $section, $action . '.php');
+        $controllerPath = $this->file->join($modulePath, 'Controller', $section, $action . '.php');
 
         // Check if controller already exists
-        if ($this->helper->exists($controllerPath)) {
+        if ($this->file->exists($controllerPath)) {
             $output->writeln("Controller '$section/$action' already exists!");
             return 1;
         }
@@ -102,8 +106,8 @@ class MakeController extends Command
         $output->writeln('Generating controller...');
 
         // Generate file
-        if (!$this->helper->copyTemplate(
-            $this->helper->joinPaths($this->helper->templatePath(), 'Controller', 'Section', 'Action.php.txt'),
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'Controller', 'Section', 'Action.php.txt'),
             $controllerPath,
             [
                 '{{ vendor }}' => $vendor,
@@ -112,7 +116,7 @@ class MakeController extends Command
                 '{{ action }}' => $action,
             ],
         )) {
-            $output->writeln('An error occured while creating \'' . $this->helper->joinPaths('Controller', $section, $action . '.php') . '\'');
+            $output->writeln('An error occured while creating \'' . $this->file->join('Controller', $section, $action . '.php') . '\'');
             return 1;
         }
 
