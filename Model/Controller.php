@@ -21,6 +21,7 @@ class Controller
     private ?OutputInterface $output;
 
     private string $controllerPath;
+    private string $frontendXmlPath;
 
     /** @inheritdoc */
     public function __construct(
@@ -41,6 +42,7 @@ class Controller
         $this->output = $module->output();
 
         $this->controllerPath = $this->file->join($this->module->path(), 'Controller', $this->section, $this->action . '.php');
+        $this->frontendXmlPath = $this->file->join($this->module->path(), 'etc', 'frontend', 'routes.xml');
     }
 
     /** Check if controller alread exists */
@@ -68,6 +70,20 @@ class Controller
         )) {
             $this->output->writeln('An error occured while creating \'' . $this->file->join('Controller', $this->section, $this->action . '.php') . '\'');
             return false;
+        }
+
+        if (!$this->file->exists($this->frontendXmlPath)) {
+            if (!$this->file->copyTemplate(
+                $this->file->join($this->dir->template(), 'etc', 'frontend', 'routes.xml'),
+                $this->frontendXmlPath,
+                [
+                    '{{ module_name }}' => $this->module->moduleName(),
+                    '{{ module_name_lower }}' => strtolower($this->module->moduleName()),
+                ],
+            )) {
+                $this->output->writeln('An error occured while creating \'' . $this->file->join('etc', 'frontend', 'routes.xml') . '\'');
+                return false;
+            }
         }
 
         return true;

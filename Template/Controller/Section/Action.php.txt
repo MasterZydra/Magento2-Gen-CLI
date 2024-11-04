@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace {{ vendor }}\{{ module }}\Controller\{{ section }};
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -16,7 +17,7 @@ class {{ action }} implements HttpGetActionInterface
     }
 
     /** Execute view action */
-    public function execute(): ResultInterface
+    public function execute(): ResultInterface|ResponseInterface
     {
         return $this->resultPageFactory->create();
     }

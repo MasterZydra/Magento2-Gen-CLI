@@ -45,8 +45,8 @@ class Block
 
         $this->blockPath = $this->file->join($this->module->path(), 'Block', $this->section, $this->action . '.php');
         $this->layoutName = strtolower($this->module->vendor()) . '_' . strtolower($this->module->module()) . '_' . strtolower($this->section) . '_' . strtolower($this->action) . '.xml';
-        $this->layoutPath = $this->file->join($this->module->path(), 'view', 'frontend', 'templates', 'layout', $this->layoutName);
-        $this->templatePath = $this->file->join($this->module->path(), 'view', 'frontend', 'templates', $this->section, $this->action . '.phtml');
+        $this->layoutPath = $this->file->join($this->module->path(), 'view', 'frontend', 'layout', $this->layoutName);
+        $this->templatePath = $this->file->join($this->module->path(), 'view', 'frontend', 'templates', strtolower($this->section), strtolower($this->action) . '.phtml');
     }
 
     /** Check if block alread exists */
@@ -85,7 +85,7 @@ class Block
         }
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'layout', 'vendor_module_section_action.xml'),
+            $this->file->join($this->dir->template(), 'view', 'frontend', 'layout', 'vendor_module_section_action.xml'),
             $this->layoutPath,
             [
                 '{{ module_name }}' => $this->module->moduleName(),
@@ -97,7 +97,7 @@ class Block
                 '{{ action_lower }}' => strtolower($this->action),
             ],
         )) {
-            $this->output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', 'layout', $this->layoutName) . '\'');
+            $this->output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'layout', $this->layoutName) . '\'');
             return false;
         }
 
@@ -113,7 +113,7 @@ class Block
                 '{{ action_lower }}' => strtolower($this->action),
             ],
         )) {
-            $this->output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', $this->section, $this->action . '.phtml') . '\'');
+            $this->output->writeln('An error occured while creating \'' . $this->file->join('view', 'frontend', 'templates', strtolower($this->section), strtolower($this->action) . '.phtml') . '\'');
             return false;
         }
 

@@ -15,4 +15,3 @@ class {{ action }} extends Template
         parent::__construct($context, $data);
     }
 }
-
