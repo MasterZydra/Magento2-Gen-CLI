@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace {{ vendor }}\{{ module }}\Helper;
 
-use Magento\Framework\App\Helper\Context;
-
 class {{ name }} extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    public function __construct(Context $context)
+    public function __construct(\Magento\Framework\App\Helper\Context $context)
     {
         parent::__construct($context);
     }

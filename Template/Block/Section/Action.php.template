@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace {{ vendor }}\{{ module }}\Block\{{ section }};
 
-use Magento\Framework\View\Element\Template;
-
-class {{ action }} extends Template
+class {{ action }} extends \Magento\Framework\View\Element\Template
 {
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,

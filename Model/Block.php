@@ -71,7 +71,7 @@ class Block
     public function copy(): bool
     {
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Block', 'Section', 'Action.php.txt'),
+            $this->file->join($this->dir->template(), 'Block', 'Section', 'Action.php.template'),
             $this->blockPath,
             [
                 '{{ vendor }}' => $this->module->vendor(),
@@ -85,7 +85,7 @@ class Block
         }
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'view', 'frontend', 'layout', 'vendor_module_section_action.xml'),
+            $this->file->join($this->dir->template(), 'view', 'frontend', 'layout', 'vendor_module_section_action.xml.template'),
             $this->layoutPath,
             [
                 '{{ module_name }}' => $this->module->moduleName(),
@@ -102,7 +102,7 @@ class Block
         }
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'section', 'action.phtml.txt'),
+            $this->file->join($this->dir->template(), 'view', 'frontend', 'templates', 'section', 'action.phtml.template'),
             $this->templatePath,
             [
                 '{{ vendor }}' => $this->module->vendor(),

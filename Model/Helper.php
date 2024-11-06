@@ -54,7 +54,7 @@ class Helper
     public function copy(): bool
     {
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Helper', 'Data.php.txt'),
+            $this->file->join($this->dir->template(), 'Helper', 'Data.php.template'),
             $this->helperPath,
             [
                 '{{ vendor }}' => $this->module->vendor(),
