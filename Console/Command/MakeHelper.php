@@ -7,17 +7,11 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Console\Command;
 
-use MasterZydra\GenCli\Helper\Dir;
-use MasterZydra\GenCli\Helper\File;
-use MasterZydra\GenCli\Helper\Question;
-use MasterZydra\GenCli\Model\Helper;
-use MasterZydra\GenCli\Model\Module;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MakeHelper extends Command
+class MakeHelper extends \Symfony\Component\Console\Command\Command
 {
     private const VENDOR = 'vendor';
     private const MODULE = 'module';
@@ -25,11 +19,11 @@ class MakeHelper extends Command
 
     /** @inheritdoc */
     public function __construct(
-        private Dir $dir,
-        private File $file,
-        private Question $question,
-        private Module $module,
-        private Helper $helper,
+        private \MasterZydra\GenCli\Helper\Dir $dir,
+        private \MasterZydra\GenCli\Helper\File $file,
+        private \MasterZydra\GenCli\Helper\Question $question,
+        private \MasterZydra\GenCli\Model\Module $module,
+        private \MasterZydra\GenCli\Model\Helper $helper,
         ?string $name = null
     ) {
         parent::__construct($name);
