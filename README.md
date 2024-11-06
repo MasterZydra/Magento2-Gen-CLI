@@ -14,6 +14,7 @@ This extension adds Laravel-like CLI commands to simplify these steps.
 | Command | Description |
 |---------|-------------|
 | `make:block` | Create a new block |
+| `make:command` | Create a new command |
 | `make:controller` | Create a new controller |
 | `make:helper` | Create a new helper |
 | `make:module` | Create a new module |

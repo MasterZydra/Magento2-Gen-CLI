@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ vendor }}\{{ module }}\Console\Command;
+
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class {{ name }} extends \Symfony\Component\Console\Command\Command
+{
+    private const ARGUMENT = 'arg';
+
+    /** @inheritdoc */
+    public function __construct(
+        ?string $name = null
+    ) {
+        parent::__construct($name);
+    }
+
+    /** @inheritdoc */
+    protected function configure(): void
+    {
+        $this->setName('{{ command }}');
+        $this->setDescription('{{ description }}');
+        $this->addArgument(self::ARGUMENT, InputArgument::OPTIONAL, 'Optional argument');
+        parent::configure();
+    }
+
+    /** Executes the current command */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $argument = $input->getArgument(self::ARGUMENT);
+
+        $output->writeln('Hello world');
+
+        return 0;
+    }
+}
