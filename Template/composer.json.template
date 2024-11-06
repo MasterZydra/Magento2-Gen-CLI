@@ -1,0 +1,20 @@
+{
+    "name": "{{ vendor_lower }}/{{ module_lower }}",
+    "description": "",
+    "keywords": ["Magento"],
+    "type": "magento2-module",
+    "require": {
+        "php": "^8.1",
+        "magento/framework": "*"
+    },
+    "version": "1.0.0",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "{{ vendor }}\\{{ module }}\\": ""
+        }
+    },
+    "minimum-stability": "stable"
+}

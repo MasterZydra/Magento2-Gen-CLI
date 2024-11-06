@@ -99,6 +99,21 @@ class Module
     public function copy(): bool
     {
         // Source: https://experienceleague.adobe.com/en/docs/commerce-learn/tutorials/backend-development/create-module
+
+        if (!$this->file->copyTemplate(
+            $this->file->join($this->dir->template(), 'composer.json.template'),
+            $this->file->join($this->modulePath, 'composer.json'),
+            [
+                '{{ vendor }}' => $this->vendor(),
+                '{{ vendor_lower }}' => strtolower($this->vendor()),
+                '{{ module }}' => $this->module(),
+                '{{ module_lower }}' => strtolower($this->module()),
+            ],
+        )) {
+            $this->output->writeln('An error occured while creating \'composer.json\'');
+            return false;
+        }
+
         if (!$this->file->copyTemplate(
             $this->file->join($this->dir->template(), 'registration.php.template'),
             $this->file->join($this->modulePath, 'registration.php'),
