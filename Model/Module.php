@@ -101,7 +101,7 @@ class Module
         // Source: https://experienceleague.adobe.com/en/docs/commerce-learn/tutorials/backend-development/create-module
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'composer.json.template'),
+            'composer.json.template',
             $this->file->join($this->modulePath, 'composer.json'),
             [
                 '{{ vendor }}' => $this->vendor(),
@@ -115,7 +115,7 @@ class Module
         }
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'registration.php.template'),
+            'registration.php.template',
             $this->file->join($this->modulePath, 'registration.php'),
             ['{{ module_name }}' => $this->moduleName],
         )) {
@@ -124,7 +124,7 @@ class Module
         }
 
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'etc', 'module.xml.template'),
+            $this->file->join('etc', 'module.xml.template'),
             $this->file->join($this->modulePath, 'etc', 'module.xml'),
             ['{{ module_name }}' => $this->moduleName],
         )) {

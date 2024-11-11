@@ -59,7 +59,7 @@ class Controller
     public function copy(): bool
     {
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Controller', 'Section', 'Action.php.template'),
+            $this->file->join('Controller', 'Section', 'Action.php.template'),
             $this->controllerPath,
             [
                 '{{ vendor }}' => $this->module->vendor(),
@@ -74,7 +74,7 @@ class Controller
 
         if (!$this->file->exists($this->frontendXmlPath)) {
             if (!$this->file->copyTemplate(
-                $this->file->join($this->dir->template(), 'etc', 'frontend', 'routes.xml.template'),
+                $this->file->join('etc', 'frontend', 'routes.xml.template'),
                 $this->frontendXmlPath,
                 [
                     '{{ module_name }}' => $this->module->moduleName(),

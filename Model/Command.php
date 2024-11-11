@@ -59,7 +59,7 @@ class Command
     public function copy(): bool
     {
         if (!$this->file->copyTemplate(
-            $this->file->join($this->dir->template(), 'Console', 'Command', 'Command.php.template'),
+            $this->file->join('Console', 'Command', 'Command.php.template'),
             $this->commandPath,
             [
                 '{{ vendor }}' => $this->module->vendor(),
@@ -75,7 +75,7 @@ class Command
 
         if (!$this->file->exists($this->diXmlPath)) {
             if (!$this->file->copyTemplate(
-                $this->file->join($this->dir->template(), 'etc', 'di.xml.template'),
+                $this->file->join('etc', 'di.xml.template'),
                 $this->diXmlPath,
                 [],
             )) {

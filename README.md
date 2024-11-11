@@ -3,6 +3,7 @@
 **Content**  
 - [Commands](#commands)
 - [Usage](#usage)
+- [Custom templates](#custom-templates)
 - [Installation](#installation)
 - [Updating to latest version](#updating-to-latest-version)
 
@@ -28,6 +29,18 @@ Vendor name (e.g. 'Magento'): Magento
 Module name (e.g. 'Sales'): Sales
 Generating files...
 Module 'Magento/Sales' was created.
+```
+
+## Custom templates
+Don't like the files the commands create?  
+With custom templates you can create a folder structure like the `Template` directory of this module.  
+You can just place the custom templates for the files you want to change.  
+Otherwise the default templates from this module will be used.
+
+The module will take the path from the environment variable `GEN_CLI_TEMPLATE`.
+
+```bash
+$ export GEN_CLI_TEMPLATE="/var/www/html/app/code/My/Templates"
 ```
 
 ## Installation

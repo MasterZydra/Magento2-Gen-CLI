@@ -16,6 +16,7 @@ class File extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         Context $context,
         private FileDriver $fileDriver,
+        private Dir $dir,
     ) {
         parent::__construct($context);
     }
@@ -29,8 +30,29 @@ class File extends \Magento\Framework\App\Helper\AbstractHelper
     /** Copy template from source to destination and replace the placeholders */
     public function copyTemplate(string $source, string $destination, array $placeholders = []): bool
     {
+        $sourcePath = $this->join($this->dir->template(), $source);
+
+        // Check if file exists in custom templates directory
+        if ($this->dir->customTemplate() !== null) {
+            $customTemplatePath = $this->join($this->dir->customTemplate(), $source);
+            if ($this->exists($customTemplatePath)) {
+                $sourcePath = $customTemplatePath;
+            }
+        }
+
+        // Check if file exists
+        if (!$this->exists($sourcePath)) {
+            return false;
+        }
+
+        return $this->copyAndReplaceTemplate($sourcePath, $destination, $placeholders);
+    }
+
+    /** Copy template from source to destination and replace the placeholders */
+    private function copyAndReplaceTemplate(string $absSource, string $destination, array $placeholders = []): bool
+    {
         // Read file content
-        $content = $this->read($source);
+        $content = $this->read($absSource);
         // Replace placeholders
         foreach ($placeholders as $placeholder => $value) {
             $content = str_replace($placeholder, $value, $content);

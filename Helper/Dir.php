@@ -42,4 +42,14 @@ class Dir extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Template';
     }
+
+    /** Gets a filesystem path of the custom templates directory*/
+    public function customTemplate(): ?string
+    {
+        $template = getenv('GEN_CLI_TEMPLATE');
+        if ($template === false) {
+            return null;
+        }
+        return rtrim($template, '/\\');
+    }
 }
