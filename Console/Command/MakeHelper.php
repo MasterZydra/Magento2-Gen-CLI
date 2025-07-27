@@ -67,7 +67,10 @@ class MakeHelper extends \Symfony\Component\Console\Command\Command
         // Check if module exists
         if (!$this->module->exists(false)) {
             $output->writeln("Module '$vendor/$module' does not exist!");
-            return 1;
+            $createModule = $this->question->ask($input, $output, 'Do you want to create it? (y/N) ', null);
+            if (strtolower($createModule ?? '') !== 'y' || !$this->module->copy()) {
+                return 1;
+            }
         }
 
         // User inputs
