@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Model;
 
-use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -23,7 +22,6 @@ class Helper
 
     /** @inheritdoc */
     public function __construct(
-        private Dir $dir,
         private File $file,
     ) {
     }
@@ -40,7 +38,7 @@ class Helper
         $this->helperPath = $this->file->join($this->module->path(), 'Helper', $this->name . '.php');
     }
 
-    /** Check if helper alread exists */
+    /** Check if helper already exists */
     public function exists(): bool
     {
         if ($this->file->exists($this->helperPath)) {

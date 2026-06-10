@@ -21,12 +21,6 @@ class File extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
-    /** Copy source into destination */
-    public function copy(string $source, string $destination): bool
-    {
-        return $this->fileDriver->copy($source, $destination);
-    }
-
     /** Copy template from source to destination and replace the placeholders */
     public function copyTemplate(string $source, string $destination, array $placeholders = []): bool
     {

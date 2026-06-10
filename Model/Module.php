@@ -77,7 +77,7 @@ class Module
         return $this->output;
     }
 
-    /** Check if module alread exists */
+    /** Check if module already exists */
     public function exists(bool $writeOutput = true): bool
     {
         if ($this->file->exists($this->registrationPath)) {

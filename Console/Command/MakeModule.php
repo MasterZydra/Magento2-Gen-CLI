@@ -17,8 +17,6 @@ class MakeModule extends \Symfony\Component\Console\Command\Command
 
     /** @inheritdoc */
     public function __construct(
-        private \MasterZydra\GenCli\Helper\Dir $dir,
-        private \MasterZydra\GenCli\Helper\File $file,
         private \MasterZydra\GenCli\Helper\Question $question,
         private \MasterZydra\GenCli\Model\Module $module,
         ?string $name = null

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Model;
 
-use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -27,7 +26,6 @@ class Block
 
     /** @inheritdoc */
     public function __construct(
-        private Dir $dir,
         private File $file,
     ) {
     }
@@ -49,7 +47,7 @@ class Block
         $this->templatePath = $this->file->join($this->module->path(), 'view', 'frontend', 'templates', strtolower($this->section), strtolower($this->action) . '.phtml');
     }
 
-    /** Check if block alread exists */
+    /** Check if block already exists */
     public function exists(): bool
     {
         if ($this->file->exists($this->blockPath)) {

@@ -22,7 +22,6 @@ class Command
 
     /** @inheritdoc */
     public function __construct(
-        private \MasterZydra\GenCli\Helper\Dir $dir,
         private \MasterZydra\GenCli\Helper\File $file,
         private \MasterZydra\GenCli\Helper\Xml $xml,
     ) {
@@ -45,7 +44,7 @@ class Command
         $this->diXmlPath = $this->file->join($this->module->path(), 'etc', 'di.xml');
     }
 
-    /** Check if controller alread exists */
+    /** Check if controller already exists */
     public function exists(): bool
     {
         if ($this->file->exists($this->commandPath)) {

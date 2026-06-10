@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace MasterZydra\GenCli\Model;
 
-use MasterZydra\GenCli\Helper\Dir;
 use MasterZydra\GenCli\Helper\File;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -25,7 +24,6 @@ class Controller
 
     /** @inheritdoc */
     public function __construct(
-        private Dir $dir,
         private File $file,
     ) {
     }
@@ -45,7 +43,7 @@ class Controller
         $this->frontendXmlPath = $this->file->join($this->module->path(), 'etc', 'frontend', 'routes.xml');
     }
 
-    /** Check if controller alread exists */
+    /** Check if controller already exists */
     public function exists(): bool
     {
         if ($this->file->exists($this->controllerPath)) {
