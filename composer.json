@@ -4,10 +4,10 @@
     "keywords": ["Mage2Gen", "Magento", "Magento2"],
     "type": "magento2-module",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "magento/framework": "*"
     },
-    "version": "1.5.0",
+    "version": "1.6.0",
     "license": "MIT",
     "autoload": {
         "files": [
